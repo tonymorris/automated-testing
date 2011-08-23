@@ -1,12 +1,17 @@
-personal_ws-1.1 en 28 
+personal_ws-1.1 en 38 
 organization
 waivable
 AUTHORIZED
+monad
 synching
 Ssection
+anecdotally
+Scalaz
+Koen
 phonogram
 sublicense
 Docbook
+Scala
 recognizably
 Licence
 ShareAlike
@@ -15,15 +20,20 @@ pre
 NONINFRINGEMENT
 utilizing
 Unported
+monads
 PGP
+Claessen
 Licensor's
 honor
 dramatico
 MERCHANTIBILITY
+ala
 CCPL
 relicensing
 WIPO
 synchronization
 Licensor
 Berne
+ScalaCheck
 phonograms
+QuickCheck
