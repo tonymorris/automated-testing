@@ -1,5 +1,5 @@
-Docbook Document
-----------------
+Automated Testing
+-----------------
 
-A template from which to create a Docbook document.
+Slides on a talk on automated testing.
 
