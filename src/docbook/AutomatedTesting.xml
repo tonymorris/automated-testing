@@ -70,7 +70,9 @@
         </para>
       </listitem>
       <listitem>
-        <code>forAll((a: Int, b: Int) => a * b == a + a * (b - 1)).check</code>
+        <para>
+          <code>forAll((a: Int, b: Int) => a * b == a + a * (b - 1)).check</code>
+        </para>
       </listitem>
       <listitem>
         <para>
