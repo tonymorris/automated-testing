@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="PseudoAutomatedTesting" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Pseudo-automated manual testing</title>
+  <itemizedlist>
+    <listitem>
+      <para>
+        We have probably seen manual testing before.
+        <programlisting lang="Java">
+assert(add(2, 3), 5);
+assert("abc".charAt(1), 'b');</programlisting>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Domain values are passed to a function anecdotally and the return value is asserted.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        It is important to testability that the function under test does not perform an unwanted side-effect.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        In manual testing, test coverage is proportional to effort required from the test author.
+      </para>
+    </listitem>
+  </itemizedlist>
+</sect1>

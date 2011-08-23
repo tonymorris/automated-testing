@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="TestDrivenDevelopment" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Test Driven Development</title>
+  <sect2>
+    <title>Tests First (reverse)</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          For any two lists x and y, concatenating x to y then reversing produces the same result as reversing y and
+          concatenating to the result of reversing x.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <programlisting lang="Scala">
+scala> def rev[A](a: List[A]) = a // incorrect but compiles
+rev: [A](a: List[A])List[A]
+
+scala> val testReverse = forAll((x: List[Int], y: List[Int]) =>
+     | rev(x ::: y) == rev(y) ::: rev(x))
+testReverse: org.scalacheck.Prop = Prop</programlisting>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>The Result?</title>
+    <para>
+      Test failure.
+      <programlisting lang="Scala">
+scala> testReverse.check
+! Falsified after 3 passed tests.
+> ARG_0: List("0") (orig arg: List("4", "-663237773", "2030426620"))
+> ARG_1: List("1") (orig arg: List("14"))</programlisting>
+    </para>
+    <para>
+      Test success!
+      <programlisting lang="Scala">
+scala> def rev[A](a: List[A]) = a.foldLeft[List[A]](
+     | Nil)((a, b) => b :: a) // correct
+rev: [A](a: List[A])List[A]
+
+scala> testReverse.check
++ OK, passed 100 tests.</programlisting>
+    </para>
+  </sect2>
+  <sect2>
+    <title>Good things sometimes come to an end</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          As with many practical things, this ability degenerates in a side-effecting environment.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Consider testing a <emphasis>mutable</emphasis> list.
+          <programlisting lang="Scala">
+val testReverse = forAll((x: MList[Int], y: MList[Int]) => {
+  x.reverse // effect
+  y.reverse // effect
+  x append y   // effect
+  x == ???             
+}</programlisting>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+</sect1>

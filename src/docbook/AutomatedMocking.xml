@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="AutomatedMocking" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Automated Mocking</title>
+  <sect2>
+    <title>What is mocking?</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Mocking is, at its essence, the generation of code for functions, with which we write tests.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          For example, <code>f</code> may be a function which closes over a state variable, incrementing each time it is called. Then
+          we may <emphasis>assert</emphasis> something about the resulting counter (e.g. <code>f.count == 1</code>).
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Quantify on functions</title>
+    <para>
+      With automated testing, we may write properties that universally quantify on functions.
+      <programlisting lang="Scala">
+scala> forAll((
+     | f: String => Int,
+     | g: List[Char] => String,
+     | x: List[List[Char]]) =>
+     | x.map(f compose g) ==
+     | (x.map(g)).map(f)
+     | ).check
++ OK, passed 100 tests.</programlisting>
+    </para>
+  </sect2>
+</sect1>

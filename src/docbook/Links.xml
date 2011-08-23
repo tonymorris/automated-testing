@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="Links" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Links</title>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <ulink url="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.119.3629&amp;rep=rep1&amp;type=pdf">
+          The original paper: QuickCheck for Haskell
+        </ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <ulink url="http://code.google.com/p/scalacheck">
+          ScalaCheck for Scala
+        </ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <ulink url="http://code.google.com/p/scalaz">
+          Scalaz bindings for ScalaCheck
+        </ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <ulink url="http://functionaljava.org/">
+          Functional Java: Automated Testing for Java
+        </ulink>
+      </para>
+    </listitem>
+  </itemizedlist>
+</sect1>

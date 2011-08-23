@@ -1,0 +1,16 @@
+Pseudo-automated manual testing
+forAll((a: Int, b: Int) => a * b == a + a * (b-1)).check
+TDD
+Tests as document (reverse)
+Mocking / generating functions
+  forAll((f: String => Int, g: List[Char] => String, x: List[List[Char]]) => x.map(f compose g) == (x.map(g)).map(f)).check
+Writing your own generators
+  scala> case class Person(name: String, age: Int) { def doubleAge = age * 2 }
+  defined class Person
+
+  scala> implicit val arbPerson = Arbitrary(for(name <- arbitrary[String]; age <- arbitrary) yield Person(name, age))
+  arbPerson: org.scalacheck.Arbitrary[Person] = org.scalacheck.Arbitrary$$anon$1@15b5219
+
+  scala> forAll((p: Person) => p.age == p.doubleAge / 2).check
+  ! Falsified after 1 passed tests.
+

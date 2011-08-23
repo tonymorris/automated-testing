@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="GeneratingUserDefinedTypes" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Generating User-defined Types</title>
+  <sect2>
+    <title>Quantifying on our own data types</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          We may want to quantify on our own data types, in which case, we must write a generator.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Luckily, a generator forms a monad! This allows you to construct generators from existing ones.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          For example, <code>case class Person(age: Int, name: String)</code>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Scala has monad comprehensions</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Scala has special syntax support for monads, making it even easier<footnote>
+            <para>
+              for-comprehensions with the <code>for</code> keyword.
+            </para>
+          </footnote>.
+        </para>
+      </listitem>
+      <listitem>
+        <programlisting lang="Scala">
+scala> implicit val personGenerator =
+| Arbitrary(
+| for(age &lt;- arbitrary[Int];
+|     name &lt;- arbitrary[String])
+| yield Person(age, name))
+personGenerator: org.scalacheck.Gen[Person] = Gen()</programlisting>
+      </listitem>
+      <listitem>
+        <para>
+          We now have a generator for <code>Person</code>, which distributes as the generator for <code>Int</code> and
+          <code>String</code> does.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>So let's quantify on a <code>Person</code></title>
+    <para>
+      Let's define a property that is simply not true.
+      <programlisting lang="Scala">
+scala> val ageLT100 = forAll((p: Person) => p.age &lt; 100)
+ageLT100: org.scalacheck.Prop = Prop</programlisting>
+    </para>
+    <para>
+      With an appropriate random data distribution we will get a failure:
+      <programlisting lang="Scala">
+scala> p.check
+! Falsified after 0 passed tests.
+> ARG_0: Person(21114,)</programlisting>
+    </para>
+  </sect2>
+</sect1>

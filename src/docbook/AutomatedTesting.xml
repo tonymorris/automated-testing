@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="AutomatedTesting" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Automated testing</title>
+  <sect2>
+    <title>Properties</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          When we automate testing, we specify <emphasis>program properties</emphasis>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          For example
+          <itemizedlist>
+            <listitem>
+              <para>
+                <code>forall a. a * 1 == a</code>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <code>forall a b. a * b == a + a * (b - 1)</code>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Randomised data</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Tests are run by distributing random data<footnote>
+            <para>
+              With libraries supporting adjustment of this distribution
+            </para>
+          </footnote> to a user-defined limit and ensuring that the property holds at all times.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          In this scenario, it is <emphasis>even more important</emphasis> that the function under test eschews side-effects.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Luckily, we use functional programming!
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          But how do we express these properties?
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Scala</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Using the programming language of course!
+        </para>
+      </listitem>
+      <listitem>
+        <code>forAll((a: Int, b: Int) => a * b == a + a * (b - 1)).check</code>
+      </listitem>
+      <listitem>
+        <para>
+          We have <emphasis>universally quantified</emphasis> (<code>forAll</code>) on two <code>Int</code> values
+          (<code>a</code> and <code>b</code>).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          We have done this by asserting that a <emphasis>program property</emphasis> holds for all argument values.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Let's run it</title>
+    <programlisting lang="Scala">
+scala> forAll((a: Int, b: Int) => a * b == a + a * (b - 1)).check
++ OK, passed 100 tests.</programlisting>
+  </sect2>
+</sect1>

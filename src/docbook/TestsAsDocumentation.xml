@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5CR1/docbookx.dtd">
+
+<sect1 id="TestsAsDocumentation" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Tests as Documentation</title>
+  <sect2>
+    <title>Once-inhabited types</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Some type signatures are <emphasis>once-inhabited</emphasis><footnote>
+            <para>
+              meaning that there exists only one possible terminating implementation of a function that satisfies that type (modulo side-effects ala Scala).
+            </para>
+          </footnote>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          For example <code>def s[A, B, C](f: A => B => C, g: A => B, a: A): C</code><footnote>
+            <para>
+              As an exercise, try inhabiting this type. If you succeed, try to find another solution.
+            </para>
+          </footnote>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Turing's Undecidability</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          However, not all types are once-inhabited<footnote>
+            <para>
+              Since this is equivalent to solving the halting problem
+            </para>
+          </footnote> such as <code>def reverse[A](a: List[A]): List[A]</code>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          How are we to know what this function does? We might take a clumsy and error-prone <emphasis>guess</emphasis> by its name.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2>
+    <title>Or is there a better way?</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Or we might look at the tests:
+          <programlisting lang="Scala">
+Nil.reverse == Nil // base case
+forall e. [e].reverse == [e] 
+forall x y. (x ::: y).reverse == y.reverse ::: x.reverse</programlisting>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          This gives an <emphasis>unambiguous and machine-checked answer</emphasis> to the question of what this function does<footnote>
+            <para>
+              Try to find another function, besides one which reverses the given list, that satisfies the type and tests.
+            </para>
+          </footnote>.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+</sect1>
