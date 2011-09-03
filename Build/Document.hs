@@ -1,23 +1,5 @@
 module Build.Document where
 
-{-
-
-Requires on the PATH
-
-* java
-* rsync
-* wget 
-* xsltproc
-* aspell
-* xmllint
-* tar
-
-Requires packages (hackage)
-
-* FilePather
-* MissingH
-
--}
 
 import Data.String.Utils hiding (join)
 import System.Cmd
@@ -25,7 +7,7 @@ import System.Exit
 import System.FilePath
 import System.Directory
 import System.IO
-import Data.List
+import Data.List hiding (find)
 import Control.Monad
 import Control.Applicative
 import System.FilePath.FilePather
@@ -144,10 +126,15 @@ indexFile ::
 indexFile =
   docbooksrc </> "index.xml"
 
+webDir ::
+  FilePath
+webDir =
+  "etc" </> "web"
+
 htmlIndex ::
   FilePath
 htmlIndex =
-  "etc" </> "index.html"
+  "etc" </> "$NAME.html"
 
 resources ::
   FilePath
@@ -228,27 +215,30 @@ uriDependencies c =
 
 getDependencies ::
   Config
-  -> IO ()
+  -> IO ExitCode
 getDependencies c =
   do mkdir lib
-     mapM_ (system' c . (\d -> unwords ["wget", "-P", lib, d])) . uriDependencies $ c
-     _ <- system' c (unwords [ "unzip -d "
-                             , lib
-                             , lib </> join ["docbook-xsl-", docbook_xsl . versions $ c, ".zip"]
-                             ])
-     _ <- let d = join ["docbook-xml-", docbook_xml . versions $ c]
-          in system' c (unwords [ "unzip -d "
-                                , lib </> d
-                                , lib </> join [d, ".zip"]
-                                ])
+     r <- fmap (\d -> unwords ["wget", "-P", lib, d]) (uriDependencies c) ++
+          [
+            unwords [ "unzip -d "
+                    , lib
+                    , lib </> join ["docbook-xsl-", docbook_xsl . versions $ c, ".zip"]
+                    ]
+          , unwords [ "rsync"
+                    , "-aH"
+                    , "xslt/"
+                    , lib </> join ["docbook-xsl-", docbook_xsl . versions $ c]
+                    ]
+          ] >--> c
      touch libGot
+     return r
 
 getDependenciesIfNotGot ::
   Config
-  -> IO ()
+  -> IO ExitCode
 getDependenciesIfNotGot c =
   do e <- doesFileExist libGot
-     unless e . getDependencies $ c
+     if e then return ExitSuccess else getDependencies c
 
 withDependencies ::
   Config
@@ -306,25 +296,25 @@ html ::
   Config
   -> IO ExitCode
 html =
-  markup "html/index.html" "html/docbook.xsl" "html"
+  markup "html/index.html" "html/docbook-utf8.xsl" "html"
 
 chunkHtml ::
   Config
   -> IO ExitCode
 chunkHtml =
-  markup "chunk-html/index.html" "html/chunk.xsl" "chunk-html"
+  markup "chunk-html/index.html" "html/docbook-chunk-utf8.xsl" "chunk-html"
 
 xhtml ::
   Config
   -> IO ExitCode
 xhtml =
-  markup "xhtml/index.html" "xhtml/docbook.xsl" "xhtml"
+  markup "xhtml/index.html" "html/docbook-utf8.xsl" "xhtml"
 
 chunkXhtml :: 
   Config
   -> IO ExitCode
 chunkXhtml =
-  markup "chunk-xhtml/index.html" "xhtml/chunk.xsl" "chunk-xhtml"
+  markup "chunk-xhtml/index.html" "html/docbook-chunk-utf8.xsl" "chunk-xhtml"
 
 fo ::
   Config
@@ -415,13 +405,32 @@ cleanBuildTargets t c =
 
 alll ::
 	Config
-  -> IO ()
+  -> IO ExitCode
 alll c =
-  do mapM_ ($c) buildAll
+  (squish . sequence buildAll) c
+
+web ::
+  Config
+  -> IO ExitCode
+web c =
+  alll c >->
+  do h <- find always (extensionEq "html") webDir
+     mapM_ (\p -> let p' = joinPath . drop (length . splitPath $ webDir) . splitPath $ p
+                      d = takeDirectory p'
+                  in do mkdir (build </> d)
+                        f <- readFile p
+                        let z = replace' f [("$TITLE", title c), ("$NAME", name c)]
+                        writeFile (build </> p') z) h
+     r <- find always (extensionSatisfies $ \p -> takeExtension p /= ".html") webDir
+     p' <- filterM doesFileExist r
+     mapM_ (\p -> let z = joinPath . drop (length . splitPath $ webDir) . splitPath $ p 
+                  in do mkdir (build </> takeDirectory z)
+                        copyFile p (build </> z)) p'
      t <- readFile htmlIndex
      d <- getDirectoryContents (dist c </> "png")
-     let p = (\(i, k) -> "<li class=\"" ++ k : "\"><a href=\"png/index" ++ i ++ ".png\">Page</a></li>") =<< ([] : map show [2 .. length . filter ("index" `isPrefixOf`) $ d]) `zip` join (repeat "ox")
-     writeFile (dist c </> name c ++ ".html") (replace "$PNGPAGES" p $ replace "$TITLE" (title c) t)
+     let pngh = (\(i, k) -> "<li class=\"" ++ k : "\"><a href=\"" ++ name c ++ "png/index" ++ i ++ ".png\">Page</a></li>") =<< ([] : map show [2 .. length . filter ("index" `isPrefixOf`) $ d]) `zip` join (repeat "ox")
+     writeFile (build </> name c ++ ".html") (replace' t [("$NAME", name c), ("$PNGPAGES", pngh), ("$TITLE", title c)])
+     system' c (unwords ["tar -C ", build, " -zcf ", build </> archive c, " ", name c])
 
 releaseBuild ::
   FilePath
@@ -559,12 +568,18 @@ exitWith' z =
   do e <- z
      exitWith e
 
+squish ::
+  [IO ExitCode]
+  -> IO ExitCode
+squish =
+  foldr (>->) (return ExitSuccess)
+
 (>-->) ::
   [String]
   -> Config
   -> IO ExitCode
 m >--> c =
-  foldr (\a b -> system' c a >-> b) (return ExitSuccess) m
+  squish (map (system' c) m)
 
 infixl 4 >-->
 
@@ -578,4 +593,12 @@ x >-> y =
        then y
        else return x'
 
+infixl 4 >->
 
+replace' ::
+  String
+  -> [(String, String)]  
+  -> String
+replace' =
+  foldl' (\s (x, y) -> replace x y s)
+  
